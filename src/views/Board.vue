@@ -1,5 +1,14 @@
 <template>
   <div class="board">
+    <div class="search-container">
+      <div class="search-btn">
+        <AppButton type="primary" @click.native="searchToggle">{{
+          isSearch ? "Close search" : "Open Search"
+        }}</AppButton>
+      </div>
+
+      <SearchTask :board="board" :openTask="openModal" v-if="isSearch" />
+    </div>
     <div class="board-container">
       <BoardColumn
         v-for="(column, $columnIndex) of board.columns"
@@ -34,33 +43,31 @@
 <script>
 import { mapState } from "vuex";
 import { elipseText } from "@/utils";
-import Task from "./Task";
+import Task from "@/views/Task";
 import AppButton from "@/components/AppButton";
 import BoardColumn from "@/components/BoardColumn";
+import SearchTask from "@/views/SearchTask";
 export default {
   components: {
     Task,
     AppButton,
-    BoardColumn
+    BoardColumn,
+    SearchTask,
   },
   data() {
     return {
       localTask: {},
       colIndex: null,
       taskIndex: null,
-      newColumnName: ""
+      newColumnName: "",
+      isSearch: false,
     };
   },
   computed: {
     ...mapState(["board"]),
     isTaskOpen() {
       return Object.keys(this.localTask).length > 0;
-    }
-  },
-  filters: {
-    crop: function(value) {
-      return elipseText(value, 100);
-    }
+    },
   },
   methods: {
     openModal(task, colIndex, taskIndex) {
@@ -75,11 +82,14 @@ export default {
     },
     createColumn() {
       this.$store.commit("CREATE_COLUMN", {
-        name: this.newColumnName
+        name: this.newColumnName,
       });
       this.newColumnName = "";
-    }
-  }
+    },
+    searchToggle() {
+      this.isSearch = !this.isSearch;
+    },
+  },
 };
 </script>
 
@@ -87,9 +97,11 @@ export default {
 .board {
   padding: 1em;
   display: flex;
+  flex-direction: column;
   max-width: 1950px;
   margin: 0 auto;
   background-color: lightslategray;
+  position: relative;
 }
 .board-container {
   display: flex;
@@ -115,37 +127,6 @@ export default {
 .tasks-wrapper {
   display: flex;
   flex-direction: column;
-}
-.task {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  box-shadow: 0px 0px 3px 0px #000000;
-  margin-bottom: 1em;
-  padding: 0.5em;
-  border-radius: 6px;
-  background-color: #ffffff;
-  cursor: pointer;
-}
-.task__title {
-  font-weight: bold;
-  display: flex;
-  justify-content: space-between;
-  text-align: left;
-  width: 100%;
-  p {
-    margin: 0.3em 0;
-  }
-}
-.task__title-name {
-  display: flex;
-  align-items: center;
-}
-.task__description {
-  margin-top: 0.5em;
-  font-size: 13px;
-  line-height: 1.5;
-  text-align: left;
 }
 .task-bg {
   position: absolute;
@@ -180,6 +161,15 @@ export default {
   padding: 1em;
   border: 2px solid lightgray;
   border-radius: 6px;
+}
+.search-container {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+}
+.search-btn {
+  align-self: flex-start;
+  margin-bottom: 1em;
 }
 @media screen and (max-width: 768px) {
   .board-container {

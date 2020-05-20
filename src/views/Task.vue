@@ -21,7 +21,9 @@
 
         <AppButton @click.native="$emit('closeAfterDelete')">Close</AppButton>
       </div>
-
+      <p class="field-title">
+        Name of this task:
+      </p>
       <input
         type="text"
         class="task-body__title"
@@ -29,7 +31,9 @@
         @change="updateTaskProperty($event, 'name')"
         @keyup.enter="updateTaskProperty($event, 'name')"
       />
-
+      <p class="field-title">
+        Descrition of this task:
+      </p>
       <textarea
         class="task-body__text"
         :value="task.description"
@@ -115,6 +119,7 @@ export default {
         toColumn: toTasks,
         taskIndex: taskIndex
       });
+      this.$emit("closeAfterDelete");
     },
     toggleMove() {
       this.isMove = !this.isMove;

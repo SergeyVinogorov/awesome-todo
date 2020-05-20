@@ -18,27 +18,16 @@
       >
     </div>
     <div class="tasks-wrapper">
-      <div
-        class="task"
+      <ColumnTask
         v-for="(task, $taskIndex) of column.tasks"
         :key="$taskIndex"
-        draggable
-        @dragstart="pickupTask($event, $taskIndex, columnIndex)"
-        @click="openModal(task, columnIndex, $taskIndex)"
-      >
-        <div class="task__title">
-          <p class="task__title-name">{{ task.name }}</p>
-          <p
-            class="task__title--status"
-            :class="task.status ? 'task__title--redy' : 'task__title--not-redy'"
-          >
-            {{ statusPrepare(task.status) }}
-          </p>
-        </div>
-        <p v-if="task.description" class="task__description">
-          {{ task.description | crop }}
-        </p>
-      </div>
+        :task="task"
+        :taskIndex="$taskIndex"
+        :columnIndex="columnIndex"
+        :column="column"
+        :board="board"
+        :openTask="openTask"
+      />
     </div>
     <input
       type="text"
@@ -50,33 +39,16 @@
 </template>
 
 <script>
-import { elipseText } from "../utils";
+import { elipseText } from "@/utils";
 import AppButton from "@/components/AppButton";
-
+import ColumnTask from "@/components/ColumnTask";
+import movingRepeatedPropsMixin from "@/mixins/movingRepeatedPropsMixin";
 export default {
-  props: {
-    column: {
-      type: Object,
-      required: true
-    },
-    columnIndex: {
-      type: Number,
-      required: true
-    },
-    board: {
-      type: Object,
-      required: true
-    },
-    openTask: {
-      type: Function,
-      required: true
-    }
+  components: {
+    AppButton,
+    ColumnTask
   },
-  filters: {
-    crop: function(value) {
-      return elipseText(value, 100);
-    }
-  },
+  mixins: [movingRepeatedPropsMixin],
   methods: {
     moveTask(e, toTasks) {
       const fromColumnIndex = e.dataTransfer.getData("from-column-index");
@@ -99,22 +71,6 @@ export default {
     deleteColumn(key) {
       this.$store.commit("DELETE_COLUMN", key);
     },
-    pickupTask(e, taskIndex, fromColumnIndex) {
-      e.dataTransfer.effectAllowed = "move";
-      e.dataTransfer.dropEffect = "move";
-
-      e.dataTransfer.setData("task-index", taskIndex);
-      e.dataTransfer.setData("from-column-index", fromColumnIndex);
-    },
-    openModal(task, colIndex, taskIndex) {
-      this.openTask(task, colIndex, taskIndex);
-      // this.colIndex = colIndex;
-      // this.taskIndex = taskIndex;
-      // this.localTask = task;
-    },
-    statusPrepare(status) {
-      return status ? "Ready" : "Not ready";
-    },
     createTask(e, tasks) {
       this.$store.commit("CREATE_TASK", {
         tasks,
@@ -124,60 +80,6 @@ export default {
     }
   }
 };
-/**
- <div
-        class="column"
-        v-for="(column, $columnIndex) of board.columns"
-        :key="$columnIndex"
-        @drop="moveTask($event, column.tasks)"
-        @dragover.prevent
-        @dragenter.prevent
-      >
-        <div class="column__title">
-          <input
-            type="text"
-            class="input-title"
-            :value="column.name"
-            @change="updateColumnProperty($event, $columnIndex)"
-            @keyup.enter="updateColumnProperty($event, $columnIndex)"
-          />
-          <AppButton type="danger" @click.native="deleteColumn($columnIndex)"
-            >Delete</AppButton
-          >
-        </div>
-        <div class="tasks-wrapper">
-          <div
-            class="task"
-            v-for="(task, $taskIndex) of column.tasks"
-            :key="$taskIndex"
-            draggable
-            @dragstart="pickupTask($event, $taskIndex, $columnIndex)"
-            @click="openModal(task, $columnIndex, $taskIndex)"
-          >
-            <div class="task__title">
-              <p class="task__title-name">{{ task.name }}</p>
-              <p
-                class="task__title--status"
-                :class="
-                  task.status ? 'task__title--redy' : 'task__title--not-redy'
-                "
-              >
-                {{ statusPrepare(task.status) }}
-              </p>
-            </div>
-            <p v-if="task.description" class="task__description">
-              {{ task.description | crop }}
-            </p>
-          </div>
-        </div>
-        <input
-          type="text"
-          class="task-add"
-          placeholder="+ Enter new task"
-          @keyup.enter="createTask($event, column.tasks)"
-        />
-      </div>
- */
 </script>
 
 <style lang="scss" scoped>
@@ -209,37 +111,6 @@ export default {
 .tasks-wrapper {
   display: flex;
   flex-direction: column;
-}
-.task {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  box-shadow: 0px 0px 3px 0px #000000;
-  margin-bottom: 1em;
-  padding: 0.5em;
-  border-radius: 6px;
-  background-color: #ffffff;
-  cursor: pointer;
-}
-.task__title {
-  font-weight: bold;
-  display: flex;
-  justify-content: space-between;
-  text-align: left;
-  width: 100%;
-  p {
-    margin: 0.3em 0;
-  }
-}
-.task__title-name {
-  display: flex;
-  align-items: center;
-}
-.task__description {
-  margin-top: 0.5em;
-  font-size: 13px;
-  line-height: 1.5;
-  text-align: left;
 }
 .task-add {
   display: block;

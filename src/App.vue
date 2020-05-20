@@ -30,6 +30,37 @@ body {
 #nav a.router-link-exact-active {
   color: #42b983;
 }
+.task {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  box-shadow: 0px 0px 3px 0px #000000;
+  margin-bottom: 1em;
+  padding: 0.5em;
+  border-radius: 6px;
+  background-color: #ffffff;
+  cursor: pointer;
+}
+.task__title {
+  font-weight: bold;
+  display: flex;
+  justify-content: space-between;
+  text-align: left;
+  width: 100%;
+  p {
+    margin: 0.3em 0;
+  }
+}
+.task__title-name {
+  display: flex;
+  align-items: center;
+}
+.task__description {
+  margin-top: 0.5em;
+  font-size: 13px;
+  line-height: 1.5;
+  text-align: left;
+}
 .task__title--redy {
   background-color: teal;
 }
@@ -41,5 +72,10 @@ body {
   padding: 0.3em;
   border-radius: 4px;
   color: #ffffff;
+}
+
+.field-title {
+  color: gray;
+  font-weight: 500;
 }
 </style>
